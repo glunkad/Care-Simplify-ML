@@ -1,19 +1,19 @@
 FROM python:3.10-slim
 
-# Install required packages
-RUN apt-get update && apt-get install -y git && apt-get clean
+# Install system dependencies
+RUN apt-get update && apt-get install -y gcc git && apt-get clean
 
 # Set working directory
 WORKDIR /app
 
 # Copy application files
-COPY main.py requirements.txt ./
+COPY . .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the application port
+# Expose port
 EXPOSE 8000
 
-# Command to run the FastAPI app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run Gunicorn with Uvicorn worker
+CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:8000"]
