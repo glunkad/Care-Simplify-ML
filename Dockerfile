@@ -1,20 +1,24 @@
+# Use the official Python image from the Docker Hub
 FROM python:3.10-slim
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y gcc git && apt-get clean
+RUN apt-get update && apt-get install -y gcc git && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Set the working directory
 WORKDIR /app
 
-# Copy application files
-COPY . .
+# Copy only the requirements file first to leverage Docker cache
+COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port
-EXPOSE 8000
+# Copy the rest of the application files
+COPY . .
 
+# Expose the port that the app runs on
+EXPOSE 10000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000"]
 # Run Gunicorn with Uvicorn worker
-CMD ["gunicorn", "-w", "1", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:10000"]
-
+# CMD ["gunicorn", "-w", "1", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:10000"]
