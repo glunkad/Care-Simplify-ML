@@ -10,16 +10,18 @@ pipe = pipeline("text-generation", model="m42-health/Llama3-Med42-8B")
 
 # Request body schema
 class MessageRequest(BaseModel):
-    messages: list[dict]
+    role: str
+    content: str
 
 @app.post("/generate")
-async def generate_text(request: MessageRequest):
+def generate_text(request: MessageRequest):
     try:
-        response = pipe(request.messages)
+        response = pipe(request)
+        
         return {"responses": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/hello")
-async def hello():
+def hello():
     return {"message": "API is running successfully!"}
