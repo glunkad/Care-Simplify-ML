@@ -19,3 +19,7 @@ async def generate_text(request: MessageRequest):
         return {"responses": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/hello")
+async def hello():
+    return {"message": "API is running successfully!"}
