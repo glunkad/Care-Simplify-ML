@@ -1,27 +1,34 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from flask import Flask, jsonify, request
 from transformers import pipeline
 
-# Initialize FastAPI app
-app = FastAPI()
-
-# Load the model pipeline
+# Initialize the text-generation pipeline
 pipe = pipeline("text-generation", model="m42-health/Llama3-Med42-8B")
 
-# Request body schema
-class MessageRequest(BaseModel):
-    role: str
-    content: str
+# Create Flask app
+app = Flask(__name__)
 
-@app.post("/generate")
-def generate_text(request: MessageRequest):
-    try:
-        response = pipe(request)
-        
-        return {"responses": response}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/hello")
+@app.route('/hello', methods=['GET'])
 def hello():
-    return {"message": "API is running successfully!"}
+    """Health check route."""
+    return "<html><body><h1>API is running!</h1></body></html>"
+
+@app.route('/generate', methods=['POST'])
+def generate():
+    """Route to handle text generation requests."""
+    try:
+        # Extract the input message from the request
+        data = request.json
+        if not data or 'messages' not in data:
+            return jsonify({"error": "Invalid request format. 'messages' key is required."}), 400
+
+        messages = data['messages']
+        # Run the pipeline
+        generated_text = pipe(messages)
+
+        return jsonify({"response": generated_text})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    import os
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
