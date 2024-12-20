@@ -1,5 +1,3 @@
-fastapi
-uvicorn
-gunicorn
+Flask
 transformers
 torch
