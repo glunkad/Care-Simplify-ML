@@ -23,7 +23,7 @@ def generate():
 
         messages = data['messages']
         # Run the pipeline
-        generated_text = pipe(messages)
+        generated_text = pipe(data)
 
         return jsonify({"response": generated_text})
     except Exception as e:
