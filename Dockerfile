@@ -11,4 +11,4 @@ RUN pip install --no-cache-dir vllm
 EXPOSE 10000
 
 # Run the model on container startup
-CMD ["vllm", "serve", "m42-health/Llama3-Med42-8B"]
+CMD ["vllm", "serve", "m42-health/Llama3-Med42-8B", "--port 10000"]
